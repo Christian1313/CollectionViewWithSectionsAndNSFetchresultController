@@ -282,25 +282,39 @@ static NSString * const subIdentifier1 = @"CollectionSubReuse";
        atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type
       newIndexPath:(NSIndexPath *)newIndexPath
 {
-    NSMutableDictionary *change = [NSMutableDictionary dictionary];
-    change[@(type)] = newIndexPath;
-    switch(type) {
-        case NSFetchedResultsChangeInsert:
-            [_itemChanges addObject:change];
-            break;
-            
-        case NSFetchedResultsChangeDelete:
-            [_itemChanges addObject:change];
-            break;
-            
-        case NSFetchedResultsChangeUpdate:
-            [_itemChanges addObject:change];
-            break;
-       
-        case NSFetchedResultsChangeMove:
-            change[@(type)] = @[indexPath, newIndexPath];
-            [_itemChanges addObject:change];
-            break;
+    
+    NSIndexPath *useIp = nil;
+    if (newIndexPath)
+    {
+        useIp = newIndexPath;
+    }
+    if (!useIp)
+    {
+        useIp = indexPath;
+    }
+    
+    if (useIp) // save guard sometime during updated the newIndexPath is nil
+    {
+        NSMutableDictionary *change = [NSMutableDictionary dictionary];
+        change[@(type)] = useIp;
+        switch(type) {
+            case NSFetchedResultsChangeInsert:
+                [_itemChanges addObject:change];
+                break;
+                
+            case NSFetchedResultsChangeDelete:
+                [_itemChanges addObject:change];
+                break;
+                
+            case NSFetchedResultsChangeUpdate:
+                [_itemChanges addObject:change];
+                break;
+                
+            case NSFetchedResultsChangeMove:
+                change[@(type)] = @[indexPath, newIndexPath];
+                [_itemChanges addObject:change];
+                break;
+        }
     }
 }
 
